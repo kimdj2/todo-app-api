@@ -1,0 +1,55 @@
+.todo-form {
+    border: 1px solid;
+}
+
+.todo-form dl {
+    padding: 10px 10px;
+}
+
+.todo-form .todo-form__button-area {
+    padding: 10px 0;
+    text-align: center;
+}
+
+.todo-form .todo-form__button-area button {
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.todo-form dl dd {
+    padding: 0 10px;
+}
+
+.todo-form dl dd input[type="text"] {
+    width: 70%;
+}
+
+.todo-form dl dd textarea {
+    width: 100%;
+}
+
+.todo-form .todo-form__button-area button {
+    border-radius: 3px;
+    width: 100px;
+    height: 30px;
+    cursor: pointer;
+}
+
+.todo-form .todo-form__button-area .todo-form__button-submit {
+    background-color: aquamarine;
+    border: 1px solid aquamarine;
+}
+
+.todo-form .todo-form__button-area .todo-form__button-back {
+    background-color: pink;
+    border: 1px solid pink;
+}
+
+.todo-form dl dd.error {
+    color: red;
+}
+
+.todo-form dl.error{
+    background-color: pink;
+}

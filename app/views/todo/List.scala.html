@@ -1,0 +1,41 @@
+@*
+ *
+ * TODOアプリ−リスト画面
+ *
+ *@
+
+@import helper._
+@import lib.model.TodoCategory
+@import helpers._
+
+@(vv: model.view.ViewValueTodoList)(implicit request: RequestHeader, messages: Messages)
+@common.Default(vv.viewValue) { 
+  <div class="todo">
+    <div class="todo-create">
+      <button onclick="location.href='@controllers.routes.TodoController.create'">作成</button>
+    </div>  
+    @for(model <- vv.model) {
+      <div class="todo-list">
+        <div class="todo-list__title">
+          <h1>@model.todo.title</h1>
+          <span class="todo-list__title--state">@model.todo.state.name</span>
+        </div>
+        <div class="todo-list__body">
+          <div class="todo-list__body--content">
+            @model.todo.body
+          </div>
+        </div>
+        <div class="todo-list__category">
+          @Html(TodoHelper.categoryName(model.category))
+        </div>
+        <div class="todo-list__button-area">
+          @helper.form(action = routes.TodoController.delete(model.todo.id)) {
+            @CSRF.formField
+            <button type="button" class="todo-list__button-edit" onclick="location.href='@controllers.routes.TodoController.edit(model.todo.id)'">編集</button>
+            <button type="submit" class="todo-list__button-delete" >削除</button>
+          }    
+        </div>
+      </div>
+    }   
+  </div>
+}

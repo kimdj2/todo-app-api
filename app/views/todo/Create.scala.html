@@ -1,0 +1,35 @@
+@*
+ *
+ * TODOアプリ−TODO作成
+ *
+ *@
+
+@import helper._
+@import forms.TodoForm._
+
+@(vv: model.view.ViewValueTodoCreate, form: Form[TodoAdd])(implicit request: RequestHeader, messages: Messages)
+
+@common.Default(vv.viewValue){
+    @helper.form(action = routes.TodoController.save) {
+      <div class="todo-form">
+        @CSRF.formField 
+        @inputText(
+          form("title"),
+          '_label -> "タイトル",
+          'class -> "todo-form__title"
+        )
+        @textarea(
+          form("body"),
+          '_label -> "内容",
+          'rows -> 15,
+          'class -> "todo-form__body",
+          '_showConstraints -> false
+        )
+        @select(form("categoryId"), options = vv.categories.map(v => (v.id.toString(), v.name)), '_label -> "カテゴリー")
+        <div class="todo-form__button-area">
+            <button type="submit" class="todo-form__button-submit">作成</button>
+            <button type="button" class="todo-form__button-back" onclick="location.href='@controllers.routes.TodoController.index'">戻る</button>    
+        </div>
+      </div>
+    }  
+}

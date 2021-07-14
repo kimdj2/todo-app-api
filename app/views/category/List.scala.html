@@ -1,0 +1,38 @@
+@*
+ *
+ * TODOアプリ−リスト画面
+ *
+ *@
+
+@import helper._
+@import lib.model.TodoCategory
+@import helpers._
+
+@(vv: model.view.ViewValueCategoryList)(implicit request: RequestHeader, messages: Messages)
+@common.Default(vv.viewValue) { 
+  <div class="category-create">
+    <button onclick="location.href='@controllers.routes.TodoCategoryController.create'">作成</button>
+  </div>
+  <div class="category">
+    @for(category <- vv.categories) {
+      <div class="category-list">
+        <div class="category-list__name">
+          <h1>@category.name</h1>
+          <div class="category-list__color @TodoCategoryHelper.getColorStyle(category.color)">
+            @category.color
+          </div>  
+        </div>
+        <div class="category-list__slug">
+          @category.slug
+        </div>
+        <div class="category-list__button-area">
+          @helper.form(action = routes.TodoCategoryController.delete(category.id)) {
+            @CSRF.formField
+            <button type="button" class="category-list__button-edit" onclick="location.href='@controllers.routes.TodoCategoryController.edit(category.id)'">編集</button>
+            <button type="submit" class="category-list__button-delete" >削除</button>
+          }    
+        </div>
+      </div>
+    }   
+  </div>
+}

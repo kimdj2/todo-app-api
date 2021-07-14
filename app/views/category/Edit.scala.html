@@ -1,0 +1,33 @@
+@*
+ *
+ * TODOアプリ−TODO作成
+ *
+ *@
+
+@import helper._
+@import forms.TodoCategoryForm._
+@import helpers.TodoCategoryHelper._
+
+@(vv: model.view.ViewValueCategoryEdit, form: Form[CategoryForm])(implicit request: RequestHeader, messages: Messages)
+@common.Default(vv.viewValue){
+    @helper.form(action = routes.TodoCategoryController.update(vv.category.id)) {
+      <div class="category-form">
+        @CSRF.formField 
+        @inputText(
+          form("name"),
+          '_label -> "カテゴリー名",
+          'class -> "category-form__name"
+        )
+        @inputText(
+          form("slug"),
+          '_label -> "スラッグ",
+          'class -> "category-form__slug"
+        )        
+        @select(form("color"), options = getColorOptions, '_label -> "色")
+        <div class="category-form__button-area">
+          <button type="submit" class="category-form__button-submit">更新</button>
+          <button type="button" class="category-form__button-back" onclick="location.href='@controllers.routes.TodoCategoryController.index'">戻る</button>    
+        </div>
+      </div>
+    }  
+}
