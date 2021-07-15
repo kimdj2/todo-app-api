@@ -7,5 +7,6 @@ target
 /.settings
 .metals
 .scalafmt.conf
+.bloop
 /RUNNING_PID
 docker/db/data/
