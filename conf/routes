@@ -4,19 +4,17 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET     /                           controllers.HomeController.index
-GET     /todo                       controllers.TodoController.index
-GET     /todo/create                controllers.TodoController.create
-POST    /todo/save                  controllers.TodoController.save
-GET     /todo/:id/edit              controllers.TodoController.edit(id: Long)
-POST    /todo/:id/update            controllers.TodoController.update(id: Long)
-POST    /todo/:id/delete            controllers.TodoController.delete(id: Long)
-GET     /category                   controllers.TodoCategoryController.index
-GET     /category/create            controllers.TodoCategoryController.create
-POST    /category/save              controllers.TodoCategoryController.save
-GET     /category/:id/edit          controllers.TodoCategoryController.edit(id: Long)
-POST    /category/:id/update        controllers.TodoCategoryController.update(id: Long)
-POST    /category/:id/delete        controllers.TodoCategoryController.delete(id: Long)
+GET        /todo/list                  controllers.TodoController.list
+GET        /todo/:id                   controllers.TodoController.show(id: Long)
+POST       /todo                       controllers.TodoController.save
+PUT        /todo/:id                   controllers.TodoController.update(id: Long)
+DELETE     /todo/:id                   controllers.TodoController.delete(id: Long)
+
+GET        /category/list              controllers.TodoCategoryController.list
+GET        /category/:id               controllers.TodoCategoryController.show(id: Long)
+POST       /category                   controllers.TodoCategoryController.save
+PUT        /category/:id               controllers.TodoCategoryController.update(id: Long)
+DELETE     /category/:id               controllers.TodoCategoryController.delete(id: Long)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

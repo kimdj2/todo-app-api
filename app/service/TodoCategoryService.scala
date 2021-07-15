@@ -8,34 +8,41 @@ import lib.persistence.onMySQL.TodoCategoryRepository
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-import model.item.TodoCategoryItem
-import forms.TodoCategoryForm._
-
 object TodoCategoryService {
-  def all(): Future[Seq[TodoCategoryItem]] = {
+
+  type ReadsTodo = json.reads.JsValueTodo
+  type WritesTodo = json.writes.JsValueTodo
+  type ReadsCategory = json.reads.JsValueTodoCategory 
+  type WritesCategory = json.writes.JsValueTodoCategory
+  val ReadsTodo = json.reads.JsValueTodo
+  val WritesTodo = json.writes.JsValueTodo
+  val ReadsCategory = json.reads.JsValueTodoCategory
+  val WritesCategory = json.writes.JsValueTodoCategory
+
+  def all(): Future[Seq[WritesCategory]] = {
     for {
       todoCategoryList <- TodoCategoryRepository.all
     } yield todoCategoryList.map(category =>
-      TodoCategoryItem(
+      WritesCategory(
         category.id,
         category.v.name,
         category.v.slug,
-        category.v.color
+        category.v.color.code
       )
     )
   }
 
-  def add(form: CategoryForm): Future[Long] = {
+  def add(category: ReadsCategory): Future[Long] = {
     TodoCategoryRepository.add(
       TodoCategory(
-        name = form.name,
-        slug = form.slug,
-        color = TodoCategory.Color(form.color.toShort)
+        name = category.name,
+        slug = category.slug,
+        color = TodoCategory.Color(category.color)
       )
     )
   }
 
-  def update(id: Long, form: CategoryForm): Future[Option[Long]] = {
+  def update(id: Long, json: ReadsCategory): Future[Option[Long]] = {
     for {
       categoryOpt <- TodoCategoryRepository.get(TodoCategory.Id(id))
     } yield {
@@ -44,9 +51,9 @@ object TodoCategoryService {
           TodoCategoryRepository.update(
             new TodoCategory.EmbeddedId(
               category.v.copy(
-                name = form.name,
-                slug = form.slug,
-                color = TodoCategory.Color(form.color.toShort)
+                name = json.name,
+                slug = json.slug,
+                color = TodoCategory.Color(json.color)
               )
             )
           )
@@ -57,17 +64,17 @@ object TodoCategoryService {
     }
   }
 
-  def get(id: Long): Future[TodoCategoryItem] = {
+  def get(id: Long): Future[WritesCategory] = {
     for {
       categoryOpt <- TodoCategoryRepository.get(TodoCategory.Id(id))
     } yield {
       categoryOpt match {
         case Some(category) =>
-          TodoCategoryItem(
+          WritesCategory(
             category.id,
             category.v.name,
             category.v.slug,
-            category.v.color
+            category.v.color.code
           )
         case None => throw new Exception("データなし")
       }
@@ -77,14 +84,10 @@ object TodoCategoryService {
   def delete(id: Long): Future[Option[Long]] = {
     for {
       categoryOpt <- TodoCategoryRepository.remove(TodoCategory.Id(id))
+      _ <- TodoRepository.removeByCategoryId(categoryOpt.get.v.id.get) if !categoryOpt.isEmpty
     } yield {
       categoryOpt match {
-        case Some(category) => {
-          for {
-            _ <- TodoRepository.removeByCategoryId(category.id)
-          } yield category.v.id
-          category.v.id
-        }
+        case Some(category) => category.v.id
         case None => throw new Exception("データなし")
       }
     }

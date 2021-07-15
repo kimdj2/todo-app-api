@@ -9,17 +9,20 @@ import lib.persistence.onMySQL.TodoRepository
 import lib.persistence.onMySQL.TodoCategoryRepository
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
-
-import model.item.TodoList
-import model.item.TodoItem
-import model.item.TodoCategoryItem
-
 import ixias.persistence.SlickRepository
 
-import forms.TodoForm._
-
 object TodoService {
-  def all(): Future[Seq[TodoList]] = {
+
+  type ReadsTodo = json.reads.JsValueTodo
+  type WritesTodo = json.writes.JsValueTodo
+  type ReadsCategory = json.reads.JsValueTodoCategory 
+  type WritesCategory = json.writes.JsValueTodoCategory
+  val ReadsTodo = json.reads.JsValueTodo
+  val WritesTodo = json.writes.JsValueTodo
+  val ReadsCategory = json.reads.JsValueTodoCategory
+  val WritesCategory = json.writes.JsValueTodoCategory
+
+  def all(): Future[Seq[WritesTodo]] = {
     for {
       todoList <- TodoRepository.all
       todoCategoryList <- TodoCategoryRepository.all
@@ -30,39 +33,36 @@ object TodoService {
         val category = todoCategoryList
           .find(_.id == todo.v.categoryId)
           .map(category =>
-            TodoCategoryItem(
+            WritesCategory(
               category.id,
               category.v.name,
               category.v.slug,
-              category.v.color
+              category.v.color.code
             )
           )
-        TodoList(
-          TodoItem(
-            todo.id,
-            todo.v.title,
-            todo.v.body,
-            todo.v.state,
-            todo.v.categoryId
-          ),
+        WritesTodo(
+          todo.id,
+          todo.v.title,
+          todo.v.body,
+          todo.v.state.code,
           category
         )
       }
     }
   }
 
-  def add(form: TodoAdd): Future[Long] = {
+  def add(todo: ReadsTodo): Future[Long] = {
     TodoRepository.add(
       Todo(
-        title = form.title,
-        body = form.body,
-        categoryId = TodoCategory.Id(form.categoryId),
+        title = todo.title,
+        body = todo.body,
+        categoryId = TodoCategory.Id(todo.categoryId),
         state = Todo.Status.TODO
       )
     )
   }
 
-  def update(id: Long, form: TodoEdit): Future[Option[Long]] = {
+  def update(id: Long, json: ReadsTodo): Future[Option[Long]] = {
     for {
       todoOpt <- TodoRepository.get(Todo.Id(id))
     } yield {
@@ -71,10 +71,10 @@ object TodoService {
           TodoRepository.update(
             new Todo.EmbeddedId(
               todo.v.copy(
-                title = form.title,
-                body = form.body,
-                categoryId = TodoCategory.Id(form.categoryId),
-                state = Todo.Status(form.state.toShort)
+                title = json.title,
+                body = json.body,
+                categoryId = TodoCategory.Id(json.categoryId),
+                state = Todo.Status(json.state)
               )
             )
           )
@@ -85,18 +85,22 @@ object TodoService {
     }
   }
 
-  def get(id: Long): Future[TodoItem] = {
+  def get(id: Long): Future[WritesTodo] = {
     for {
       todoOpt <- TodoRepository.get(Todo.Id(id))
+      category <- TodoCategoryRepository.get(todoOpt.get.v.categoryId)
+      if todoOpt.isDefined
     } yield {
       todoOpt match {
         case Some(todo) =>
-          TodoItem(
+          WritesTodo(
             todo.id,
             todo.v.title,
             todo.v.body,
-            todo.v.state,
-            todo.v.categoryId
+            todo.v.state.code,
+            category.map(c =>
+              WritesCategory(c.id, c.v.name, c.v.slug, c.v.color.code)
+            )
           )
         case None => throw new Exception("データなし")
       }
