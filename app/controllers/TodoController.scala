@@ -26,9 +26,7 @@ class TodoController @Inject() (val controllerComponents: ControllerComponents)
     for {
       todoList <- TodoService.all
     } yield {
-      Ok(Json.toJson({
-        Json.obj("todo_list" -> todoList)
-      }))
+      Ok(Json.toJson(todoList))
     }
   }
 
