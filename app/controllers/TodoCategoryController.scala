@@ -31,9 +31,7 @@ class TodoCategoryController @Inject() (
     for {
       categoryList <- TodoCategoryService.all
     } yield {
-      Ok(Json.toJson({
-        Json.obj("category_list" -> categoryList)
-      }))
+      Ok(Json.toJson(categoryList))
     }
   }
 
