@@ -44,15 +44,16 @@ class UserController @Inject() (
         user => {
           (for {
             loginUser <- UserService.get(user.email) if loginUser.isEmpty
-            uid <- UserService.add(user.copy(password = hashPassword(user.password)))  
+            uid <- UserService
+              .add(user.copy(password = hashPassword(user.password)))
             result <- authProfile.loginSucceeded(
               User.Id(uid),
               { _ =>
                 Ok(Json.obj("result" -> "OK!"))
               }
             )
-          } yield result) recover { 
-            case _: Exception => BadRequest(Json.obj("message" -> "Duplicate Error"))
+          } yield result) recover { case _: Exception =>
+            BadRequest(Json.obj("message" -> "Duplicate Error"))
           }
         }
       )
@@ -70,18 +71,34 @@ class UserController @Inject() (
         user => {
           (for {
             loginUser <- UserService.get(user.email)
+            if !loginUser.isEmpty
             result <- authProfile.loginSucceeded(
               User.Id(loginUser.get.id),
               { _ =>
-                Ok(Json.obj("result" -> "OK!"))
+                Ok(Json.toJson(loginUser.get.copy(password = "")))
               }
-            ) if !loginUser.isEmpty
-            if checkPassword(user.password, loginUser.get.password)
+            ) if checkPassword(user.password, loginUser.get.password)
           } yield result) recover { case _: Exception =>
             Unauthorized(Json.obj("message" -> "Auth Error"))
           }
         }
       )
+  }
+
+  def authCheck() = Authenticated(authProfile) { implicit req =>
+    authProfile.loggedIn { user =>
+      Ok(Json.toJson(json.writes.JsValueUser(user.id, user.v.email, "")))
+    }
+  }
+
+  def logout() = Authenticated(authProfile).async { implicit req =>
+    authProfile.loggedIn { user =>
+      authProfile.logoutSucceeded(
+        user.id, {
+          Ok(Json.obj("result" -> "OK!"))
+        }
+      )
+    }
   }
 
   // パスワード機能
