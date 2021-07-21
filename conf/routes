@@ -16,5 +16,8 @@ POST       /category                   controllers.TodoCategoryController.save
 PUT        /category/:id               controllers.TodoCategoryController.update(id: Long)
 DELETE     /category/:id               controllers.TodoCategoryController.delete(id: Long)
 
+POST       /user                       controllers.UserController.save
+POST       /login                      controllers.UserController.login
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

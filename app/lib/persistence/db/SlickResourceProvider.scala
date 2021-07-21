@@ -15,11 +15,13 @@ trait SlickResourceProvider[P <: JdbcProfile] {
   object UserTable extends UserTable
   object TodoTable extends TodoTable
   object TodoCategoryTable extends TodoCategoryTable
+  object AuthTokenTable extends AuthTokenTable
 
   // --[ テーブル定義 ] --------------------------------------
   lazy val AllTables = Seq(
     UserTable,
     TodoTable,
-    TodoCategoryTable
+    TodoCategoryTable,
+    AuthTokenTable
   )
 }

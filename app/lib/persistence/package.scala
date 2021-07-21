@@ -14,5 +14,6 @@ package object persistence {
     object UserRepository extends UserRepository
     object TodoRepository extends TodoRepository
     object TodoCategoryRepository extends TodoCategoryRepository
+    object AuthTokenRepository extends AuthTokenRepository
   }
 }
